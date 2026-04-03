@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Träningsdagbok</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080810;--s1:#10101c;--s2:#181826;--s3:#20202e;--acc:#e8ff47;--acc2:#ff6b35;--blue:#4a9eff;--text:#eeeef5;--muted:#5a5a72;--border:rgba(255,255,255,0.06);--danger:#ff4545;--green:#47ffb0;--r:16px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.4;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(232,255,71,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 90% 100%,rgba(255,107,53,0.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:90px;scrollbar-width:none;}
+.screen::-webkit-scrollbar{display:none;}
+.header{padding:40px 16px 12px;display:flex;justify-content:space-between;align-items:flex-end;}
+.header-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:4px;}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:800;line-height:0.9;letter-spacing:1px;}
+.header-title span{color:var(--acc);}
+.bottom-nav{display:flex;background:rgba(8,8,16,0.92);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:10px 8px 28px;flex-shrink:0;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Nunito',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;padding:8px 4px;border-radius:12px;transition:all 0.2s;}
+.nav-btn.active{color:var(--acc);background:rgba(232,255,71,0.07);}
+.nav-icon{font-size:20px;line-height:1;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.card-title{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:12px;}
+.pad{padding:0 16px;}
+.sh{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;letter-spacing:1px;margin:16px 16px 10px;color:var(--text);}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.btn:active{transform:scale(0.97);}
+.btn-acc{background:var(--acc);color:#080810;}
+.btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border);}
+.btn-danger{background:rgba(255,69,69,0.1);color:var(--danger);border:1px solid rgba(255,69,69,0.2);}
+.btn-sm{padding:10px 16px;font-size:13px;border-radius:10px;width:auto;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.fg label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+input,select,textarea{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:15px;font-family:'Nunito',sans-serif;width:100%;transition:border-color 0.2s;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);}
+textarea{resize:none;height:70px;}
+select option{background:#181826;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fw{grid-column:1/-1;}
+/* Program pills on home */
+.prog-select-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 16px 12px;}
+.prog-select-row::-webkit-scrollbar{display:none;}
+.prog-pill{flex-shrink:0;padding:10px 18px;border-radius:100px;border:1px solid var(--border);background:var(--s1);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;}
+.prog-pill.active{background:var(--acc);color:#080810;border-color:var(--acc);}
+/* Pass tiles */
+.pass-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
+.pass-tile{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.pass-tile:active{transform:scale(0.97);}
+.pass-tile.next-up{border-color:rgba(232,255,71,0.35);background:rgba(232,255,71,0.04);}
+.pass-tile-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--acc);margin-bottom:4px;}
+.pass-tile-meta{font-size:11px;color:var(--muted);}
+.progress-bar{height:4px;background:var(--s3);border-radius:100px;overflow:hidden;margin-top:10px;}
+.progress-fill{height:100%;background:var(--acc);border-radius:100px;transition:width 0.4s ease;}
+.progress-lbl{font-size:10px;color:var(--muted);margin-top:4px;}
+.next-badge{position:absolute;top:10px;right:10px;background:var(--acc);color:#080810;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:100px;}
+/* Season banner */
+.season-banner{margin:0 16px 12px;background:linear-gradient(135deg,rgba(71,255,176,0.1),rgba(232,255,71,0.06));border:1px solid rgba(71,255,176,0.25);border-radius:var(--r);padding:14px;display:flex;gap:12px;align-items:flex-start;}
+/* Reminder */
+.reminder{display:none;margin:0 16px 12px;background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(232,255,71,0.06));border:1px solid rgba(255,107,53,0.3);border-radius:var(--r);padding:14px;flex-direction:row;gap:12px;align-items:flex-start;}
+.reminder.show{display:flex;}
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:6px;}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;line-height:1;}
+.stat-unit{font-family:'Nunito',sans-serif;font-size:13px;color:var(--muted);font-weight:400;}
+.stat-chg{font-size:12px;font-weight:700;margin-top:4px;}
+.up{color:var(--acc);}.dn{color:var(--danger);}.neu{color:var(--muted);}
+/* History */
+.hist-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;}
+.hist-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.hist-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--acc);}
+.hist-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;}
+.hist-ex-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;margin-top:6px;}
+.hist-sets{font-size:11px;color:var(--muted);line-height:1.7;}
+.stag{display:inline-block;padding:2px 7px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:rgba(71,255,176,0.1);color:var(--green);margin-left:4px;}
+/* Active pass */
+.ex-block{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.ex-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;}
+.prev-hint{font-size:10px;color:var(--muted);margin-bottom:8px;font-style:italic;}
+.ex-inputs{display:flex;gap:10px;align-items:center;}
+.ex-inputs .wi{display:flex;flex-direction:column;gap:4px;width:90px;flex-shrink:0;}
+.ex-inputs .ri{display:flex;flex-direction:column;gap:4px;flex:1;}
+.ex-inputs label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.ex-inputs input{padding:10px 12px;font-size:15px;}
+.ex-sep{color:var(--muted);font-size:18px;padding-top:20px;flex-shrink:0;}
+/* Pills */
+.pill-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 16px 12px;scrollbar-width:none;flex-shrink:0;}
+.pill-tabs::-webkit-scrollbar{display:none;}
+.pill{flex-shrink:0;padding:8px 18px;border-radius:100px;border:1px solid var(--border);background:var(--s1);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;}
+.pill.active{background:var(--acc);color:#080810;border-color:var(--acc);}
+/* Mått */
+.mu{position:relative;}.mu input{padding-right:40px;}.mu .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none;}
+/* Toggle */
+.tog-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.tog-row:last-child{border-bottom:none;}
+.tog-lbl{font-size:14px;font-weight:600;}.tog-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.tog{width:44px;height:26px;background:var(--s3);border-radius:100px;position:relative;cursor:pointer;border:1px solid var(--border);transition:background 0.3s;flex-shrink:0;}
+.tog.on{background:var(--acc);}
+.tog::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform 0.3s;}
+.tog.on::after{transform:translateX(18px);}
+/* Back */
+.back-btn{background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;padding:12px 16px 0;display:flex;align-items:center;gap:6px;}
+.back-btn:active{color:var(--acc);}
+/* Toast */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--acc);color:#080810;padding:11px 22px;border-radius:100px;font-weight:700;font-size:14px;z-index:999;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* Empty */
+.empty{text-align:center;padding:32px 20px;color:var(--muted);font-size:13px;line-height:1.7;}
+.empty-icon{font-size:34px;display:block;margin-bottom:10px;}
+/* Screens */
+[data-screen]{display:none;flex-direction:column;height:100%;}
+[data-screen].active{display:flex;}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--s1);border-radius:20px 20px 0 0;padding:24px 16px 44px;width:100%;max-height:85vh;overflow-y:auto;border-top:1px solid var(--border);}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;margin-bottom:16px;}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;margin-top:-4px;}
+.ex-br{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ex-br input{flex:1;}
+.ex-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;}
+.prog-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HOME -->
+<div data-screen="home" class="active">
+  <div class="screen">
+    <div class="header">
+      <div><div class="header-tag">Din personliga</div><div class="header-title">TRÄNINGS<span>DAGBOK</span></div></div>
+    </div>
+    <div class="reminder" id="reminder">
+      <div style="font-size:22px">📅</div>
+      <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">Dags att mäta!</div><div style="font-size:12px;color:var(--muted);line-height:1.5">Över en vecka sedan du registrerade mått.</div></div>
+    </div>
+    <div id="season-banner"></div>
+    <div class="sh">VÄLJ PROGRAM</div>
+    <div class="prog-select-row" id="home-prog-pills"></div>
+    <div class="sh">VÄLJ PASS</div>
+    <div class="pass-grid" id="home-pass-grid"></div>
+    <div class="sh">SENASTE MÅTT</div>
+    <div class="pad"><div class="stat-grid" id="home-stats"></div></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
+    <button class="nav-btn" onclick="goScreen('history')"><span class="nav-icon">📋</span>Historik</button>
+    <button class="nav-btn" onclick="goScreen('mått')"><span class="nav-icon">📏</span>Mått</button>
+    <button class="nav-btn" onclick="goScreen('manage')"><span class="nav-icon">⚙️</span>Hantera</button>
+  </div>
+</div>
+
+<!-- ACTIVE PASS -->
+<div data-screen="active-pass">
+  <div class="screen">
+    <button class="back-btn" onclick="goScreen('home')">← Tillbaka</button>
+    <div class="header">
+      <div><div class="header-tag" id="active-prog-tag"></div><div class="header-title" id="active-pass-title"></div></div>
+    </div>
+    <div class="pad">
+      <div class="row2" style="margin-bottom:10px">
+        <div class="fg"><label>Datum</label><input type="date" id="active-datum"></div>
+        <div class="fg"><label>Plats (valfri)</label><input type="text" id="active-plats" placeholder="Gym, Sisjön..."></div>
+      </div>
+    </div>
+    <div class="pad" id="active-exercises"></div>
+    <div class="pad" style="margin-top:8px;padding-bottom:16px">
+      <button class="btn btn-acc" onclick="saveWorkout()">💾 Spara träningspass</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
+    <button class="nav-btn" onclick="goScreen('history')"><span class="nav-icon">📋</span>Historik</button>
+    <button class="nav-btn" onclick="goScreen('mått')"><span class="nav-icon">📏</span>Mått</button>
+    <button class="nav-btn" onclick="goScreen('manage')"><span class="nav-icon">⚙️</span>Hantera</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div data-screen="history">
+  <div class="screen">
+    <div class="header"><div><div class="header-tag">All din</div><div class="header-title">HISTORIK</div></div></div>
+    <div class="pill-tabs" id="history-filters"></div>
+    <div class="pad" id="history-list"></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
+    <button class="nav-btn active" onclick="goScreen('history')"><span class="nav-icon">📋</span>Historik</button>
+    <button class="nav-btn" onclick="goScreen('mått')"><span class="nav-icon">📏</span>Mått</button>
+    <button class="nav-btn" onclick="goScreen('manage')"><span class="nav-icon">⚙️</span>Hantera</button>
+  </div>
+</div>
+
+<!-- MÅTT -->
+<div data-screen="mått">
+  <div class="screen">
+    <div class="header"><div><div class="header-tag">Registrera</div><div class="header-title">MÅTT</div></div></div>
+    <div class="pad">
+      <div class="card">
+        <div class="card-title">Nya mätvärden</div>
+        <div class="row2">
+          <div class="fg fw"><label>Datum</label><input type="date" id="m-datum"></div>
+          <div class="fg"><label>Vikt</label><div class="mu"><input type="number" id="m-vikt" placeholder="0.0" step="0.1"><span class="u">kg</span></div></div>
+          <div class="fg"><label>Midja</label><div class="mu"><input type="number" id="m-midja" placeholder="0" step="0.5"><span class="u">cm</span></div></div>
+          <div class="fg"><label>Höft</label><div class="mu"><input type="number" id="m-höft" placeholder="0" step="0.5"><span class="u">cm</span></div></div>
+          <div class="fg"><label>Hals</label><div class="mu"><input type="number" id="m-hals" placeholder="0" step="0.5"><span class="u">cm</span></div></div>
+        </div>
+        <button class="btn btn-acc" onclick="saveMått()">💾 Spara mått</button>
+      </div>
+    </div>
+    <div class="sh">HISTORIK</div>
+    <div class="pad" id="mått-history"></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
+    <button class="nav-btn" onclick="goScreen('history')"><span class="nav-icon">📋</span>Historik</button>
+    <button class="nav-btn active" onclick="goScreen('mått')"><span class="nav-icon">📏</span>Mått</button>
+    <button class="nav-btn" onclick="goScreen('manage')"><span class="nav-icon">⚙️</span>Hantera</button>
+  </div>
+</div>
+
+<!-- MANAGE -->
+<div data-screen="manage">
+  <div class="screen">
+    <div class="header">
+      <div><div class="header-tag">Hantera</div><div class="header-title">PROGRAM</div></div>
+      <button class="btn btn-acc btn-sm" onclick="openAddProgram()">+ Nytt</button>
+    </div>
+    <div class="pad" id="manage-list"></div>
+    <div class="sh">PÅMINNELSER</div>
+    <div class="pad">
+      <div class="card">
+        <div class="tog-row">
+          <div><div class="tog-lbl">Veckovisa påminnelser</div><div class="tog-desc">Visa påminnelse på hemskärmen</div></div>
+          <div class="tog" id="rem-tog" onclick="toggleReminder()"></div>
+        </div>
+        <div class="tog-row">
+          <div><div class="tog-lbl">Påminnelsedag</div></div>
+          <select id="rem-day" style="width:auto;padding:8px 12px;font-size:13px" onchange="saveSettings()">
+            <option value="0">Söndag</option><option value="1">Måndag</option><option value="2">Tisdag</option><option value="3">Onsdag</option><option value="4">Torsdag</option><option value="5">Fredag</option><option value="6">Lördag</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="sh">DATA</div>
+    <div class="pad">
+      <div class="card">
+        <div style="margin-bottom:14px">
+          <div class="tog-lbl" style="margin-bottom:4px">Exportera data</div>
+          <div class="tog-desc" style="margin-bottom:12px">Ladda ner all data som JSON</div>
+          <button class="btn btn-sec" onclick="exportData()">📤 Exportera</button>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px">
+          <div class="tog-lbl" style="color:var(--danger);margin-bottom:4px">Rensa all data</div>
+          <div class="tog-desc" style="margin-bottom:12px">Tar bort all data permanent</div>
+          <button class="btn btn-danger" onclick="clearAll()">🗑️ Rensa data</button>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:24px;color:var(--muted);font-size:11px">All data sparas lokalt på din enhet</div>
+  </div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
+    <button class="nav-btn" onclick="goScreen('history')"><span class="nav-icon">📋</span>Historik</button>
+    <button class="nav-btn" onclick="goScreen('mått')"><span class="nav-icon">📏</span>Mått</button>
+    <button class="nav-btn active" onclick="goScreen('manage')"><span class="nav-icon">⚙️</span>Hantera</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ADD PROGRAM -->
+<div class="modal-overlay" id="modal-add-program">
+  <div class="modal">
+    <div class="modal-title">Nytt program <button class="modal-close" onclick="closeModal('modal-add-program')">×</button></div>
+    <div class="fg"><label>Programnamn</label><input type="text" id="new-prog-name" placeholder="t.ex. Styrka Fas 3"></div>
+    <div class="fg"><label>Ikon (emoji)</label><input type="text" id="new-prog-icon" placeholder="💪" maxlength="2"></div>
+    <button class="btn btn-acc" style="margin-top:8px" onclick="addProgram()">Spara program</button>
+  </div>
+</div>
+
+<!-- MODAL: ADD PASS -->
+<div class="modal-overlay" id="modal-add-pass">
+  <div class="modal">
+    <div class="modal-title">Nytt pass <button class="modal-close" onclick="closeModal('modal-add-pass')">×</button></div>
+    <div class="fg"><label>Passnamn</label><input type="text" id="new-pass-name" placeholder="t.ex. Pass A"></div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;margin:12px 0 8px">ÖVNINGAR</div>
+    <div id="new-pass-exercises"></div>
+    <button class="add-set-btn" onclick="addExField()" style="margin-bottom:16px">+ Lägg till övning</button>
+    <button class="btn btn-acc" onclick="addPass()">Spara pass</button>
+  </div>
+</div>
+
+<!-- MODAL: MANAGE PASSES -->
+<div class="modal-overlay" id="modal-passes">
+  <div class="modal">
+    <div class="modal-title" id="modal-passes-title">Pass <button class="modal-close" onclick="closeModal('modal-passes')">×</button></div>
+    <div id="modal-passes-list"></div>
+    <button class="btn btn-acc" style="margin-top:12px" onclick="openAddPassFromManage()">+ Nytt pass</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SEASON_SIZE = 8;
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)) } catch { return null } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  programs: () => DB.get('programs') || [],
+  workouts: () => DB.get('workouts') || [],
+  mått: () => DB.get('mått') || [],
+  settings: () => DB.get('settings') || { reminders:true, reminderDay:1 },
+};
+
+function hw(){ return 'hw_'+Math.random().toString(36).slice(2,9); }
+
+function initData(){
+  if(DB.get('v3_init')) return;
+  const programs = [
+    { id:'p1', name:'Program 1', icon:'🏋️', passes:[
+      { id:'p1-1', name:'Pass 1', exercises:['Latsdrag','Incline hantelpress','Rodd övre rygg','Triceps pushdown','Lateral raises'] },
+      { id:'p1-2', name:'Pass 2', exercises:['SRDL / Marklyft','Benspark','Hip adduktor','Legcurl','GHD situp'] },
+      { id:'p1-3', name:'Pass 3', exercises:['Smalbänk','Hantelrodd','Bicepscurls','Chestfly','Back extension'] },
+      { id:'p1-4', name:'Pass 4', exercises:['Hack squat','Legcurl','Hipptrust','Benspark','GHD'] }
+    ]},
+    { id:'p2', name:'Program 2', icon:'💪', passes:[
+      { id:'p2-1', name:'Pass 1', exercises:['Kabel latsrodd','Low to high chest','Kelso shrugs','Overhead triceps','Lateral raises'] },
+      { id:'p2-2', name:'Pass 2', exercises:['SRDL','Sissy squat','Hip adduktor','Legcurl','GHD situp / Back extension'] },
+      { id:'p2-3', name:'Pass 3', exercises:['Bänkpress','Sälrodd','Bicepscurls','Armhävningar','Back extension'] },
+      { id:'p2-4', name:'Pass 4', exercises:['Leg press / Hack squat','Hamstring curl','Single leg hip thrust','Benspark','GHD / Back extension'] }
+    ]},
+    { id:'p3', name:'Rehab', icon:'🩹', passes:[
+      { id:'p3-1', name:'Dag 1', exercises:['Utfallsteg','Legcurl','Smalbänk','Latspulldown','Bicepscurls'] },
+      { id:'p3-2', name:'Dag 3', exercises:['Latsrodd','Triceps pushdown','Benspark','Rygglyft','Bicepscurls kabel'] },
+      { id:'p3-3', name:'Dag 5', exercises:['Hantelpress','Curls i Smith','Kelso shrugs','Hamstring curls','Benspark'] },
+      { id:'p3-4', name:'Dag 7', exercises:['Jeffersons curl','Push up hold','Seated pancake','Stående tåhäv','Cable crunches'] }
+    ]}
+  ];
+  DB.set('programs', programs);
+
+  const workouts = [
+    {id:hw(),date:'2024-01-10',programId:'p1',programName:'Program 1',passId:'p1-2',passName:'Pass 2',place:'',season:1,exercises:[{name:'SRDL / Marklyft',sets:[{w:55,r:'10,12,12'},{w:65,r:'8,8,10'},{w:55,r:'12,12'}]},{name:'Benspark',sets:[{w:97.5,r:'9,9,10'},{w:97.5,r:'10,10,11'},{w:190,r:'10,12,12'}]},{name:'Hip adduktor',sets:[{w:42.5,r:'12,12,12'},{w:42.5,r:'12,12,12'},{w:77,r:'12,12,12'}]},{name:'Legcurl',sets:[{w:65,r:'8,9'},{w:67.5,r:'7,8'},{w:59,r:'10,10'}]},{name:'GHD situp',sets:[{w:0,r:'12,12,15'},{w:0,r:'12,12,12'}]}]},
+    {id:hw(),date:'2024-01-12',programId:'p1',programName:'Program 1',passId:'p1-3',passName:'Pass 3',place:'',season:1,exercises:[{name:'Smalbänk',sets:[{w:70,r:'6,7,8'},{w:70,r:'7,8,9'},{w:75,r:'5,6,6'}]},{name:'Hantelrodd',sets:[{w:35,r:'8,8,8,8'},{w:35,r:'8,8,8,8'},{w:35,r:'8,8,8,8'}]},{name:'Bicepscurls',sets:[{w:30,r:'7,8,9'},{w:30,r:'7,8,9'},{w:30,r:'6,8,10'}]},{name:'Chestfly',sets:[{w:12.5,r:'9,13'},{w:12.5,r:'12,14'},{w:15,r:'10,12'}]},{name:'Back extension',sets:[{w:20,r:'10,12,12'},{w:20,r:'12,12,12'},{w:20,r:'12,12,12'}]}]},
+    {id:hw(),date:'2024-01-14',programId:'p1',programName:'Program 1',passId:'p1-4',passName:'Pass 4',place:'',season:1,exercises:[{name:'Hack squat',sets:[{w:97,r:'8,8,10'},{w:90,r:'10,10,12'},{w:97,r:'8,8,10'}]},{name:'Legcurl',sets:[{w:67.5,r:'9,10'},{w:67.5,r:'11,9'},{w:67.5,r:'9,10'}]},{name:'Hipptrust',sets:[{w:50,r:'12,12'},{w:60,r:'12,12'},{w:60,r:'12,12'}]},{name:'Benspark',sets:[{w:97.5,r:'9,10,10'},{w:97.5,r:'9,10,12'},{w:97.5,r:'9,9,11'}]},{name:'GHD',sets:[{w:0,r:'12,12,15'},{w:0,r:'15,15,15'},{w:0,r:'15,15,15'}]}]},
+    {id:hw(),date:'2024-01-16',programId:'p1',programName:'Program 1',passId:'p1-1',passName:'Pass 1',place:'',season:1,exercises:[{name:'Latsdrag',sets:[{w:75,r:'7,6,7'},{w:80,r:'6,8,7'},{w:80,r:'8,8,9'},{w:80,r:'6,6,7'}]},{name:'Incline hantelpress',sets:[{w:25,r:'8,8,10'},{w:25,r:'8,11,10'},{w:25,r:'11,11,12'}]},{name:'Rodd övre rygg',sets:[{w:65,r:'6,6'},{w:70,r:'8,8'},{w:70,r:'7,6'}]},{name:'Triceps pushdown',sets:[{w:30,r:'8,8'},{w:30,r:'10,9'},{w:30,r:'9,9'}]},{name:'Lateral raises',sets:[{w:57.5,r:'7,8,9'},{w:57.5,r:'7,8,9'},{w:60,r:'7,6,7'}]}]},
+    {id:hw(),date:'2024-02-05',programId:'p2',programName:'Program 2',passId:'p2-1',passName:'Pass 1',place:'',season:1,exercises:[{name:'Kabel latsrodd',sets:[{w:70,r:'6,7,6'},{w:70,r:'7,8,8'},{w:75,r:'7,8,8'}]},{name:'Low to high chest',sets:[{w:12.5,r:'8,8,10'},{w:12.5,r:'9,11,10'},{w:15,r:'7,8,8'}]},{name:'Kelso shrugs',sets:[{w:60,r:'8,10,10'},{w:60,r:'8,10,12'},{w:65,r:'8,10,12'}]},{name:'Overhead triceps',sets:[{w:25,r:'8,9,10'},{w:25,r:'10,11'},{w:25,r:'12,14'}]},{name:'Lateral raises',sets:[{w:50,r:'8,10,10'},{w:52.5,r:'9,10,11'},{w:55,r:'7,8,7'}]}]},
+    {id:hw(),date:'2024-02-12',programId:'p2',programName:'Program 2',passId:'p2-1',passName:'Pass 1',place:'',season:1,exercises:[{name:'Kabel latsrodd',sets:[{w:75,r:'7,8,8'},{w:75,r:'8,9,9'},{w:75,r:'9,9,10'}]},{name:'Low to high chest',sets:[{w:12.5,r:'10,11,10'},{w:12.5,r:'10,11,12'},{w:15,r:'8,8,9'}]},{name:'Kelso shrugs',sets:[{w:60,r:'10,11,12'},{w:60,r:'10,12,12'},{w:60,r:'12,12,12'}]},{name:'Overhead triceps',sets:[{w:25,r:'9,10'},{w:25,r:'10,13'},{w:25,r:'12,15'}]},{name:'Lateral raises',sets:[{w:52.5,r:'10,12,12'},{w:55,r:'8,9,10'},{w:55,r:'7,10,9'}]}]},
+    {id:hw(),date:'2024-02-07',programId:'p2',programName:'Program 2',passId:'p2-2',passName:'Pass 2',place:'',season:1,exercises:[{name:'SRDL',sets:[{w:45,r:'8,8,10'},{w:45,r:'10,10,10'},{w:55,r:'8,8,8'}]},{name:'Sissy squat',sets:[{w:0,r:'8,10'},{w:0,r:'10,12'},{w:0,r:'10,14'}]},{name:'Hip adduktor',sets:[{w:40,r:'12,15'},{w:42.5,r:'11,14'},{w:42.5,r:'12,12'}]},{name:'Legcurl',sets:[{w:60,r:'11,14'},{w:62.5,r:'8,9'},{w:62.5,r:'10,11'}]},{name:'GHD situp / Back extension',sets:[{w:20,r:'20,20,20'},{w:25,r:'20,20,20'},{w:0,r:'10,10,12'}]}]},
+    {id:hw(),date:'2024-02-19',programId:'p2',programName:'Program 2',passId:'p2-2',passName:'Pass 2',place:'',season:1,exercises:[{name:'SRDL',sets:[{w:55,r:'10,10,12'},{w:60,r:'8,10,12'},{w:55,r:'10,10,10'}]},{name:'Sissy squat',sets:[{w:0,r:'12,15'},{w:0,r:'12,15'},{w:0,r:'13,15'}]},{name:'Legcurl',sets:[{w:65,r:'8,9'},{w:65,r:'9,10'},{w:65,r:'10,11'}]},{name:'GHD situp / Back extension',sets:[{w:20,r:'20,20,30'},{w:0,r:'12,12,15'},{w:0,r:'12,14,15'}]}]},
+    {id:hw(),date:'2024-02-09',programId:'p2',programName:'Program 2',passId:'p2-3',passName:'Pass 3',place:'',season:1,exercises:[{name:'Bänkpress',sets:[{w:75,r:'6,5,7'},{w:75,r:'6,6,7'},{w:70,r:'8,8,10'}]},{name:'Sälrodd',sets:[{w:40,r:'12,14'},{w:50,r:'8,10'},{w:55,r:'9,11'}]},{name:'Bicepscurls',sets:[{w:25,r:'8,10,12'},{w:25,r:'7,10,13'},{w:30,r:'7,8,8'}]},{name:'Armhävningar',sets:[{w:0,r:'17,18'},{w:0,r:'20,20'},{w:0,r:'20,18'}]},{name:'Back extension',sets:[{w:20,r:'8,8,8'},{w:20,r:'8,10,12'},{w:20,r:'8,10,10'}]}]},
+    {id:hw(),date:'2024-02-23',programId:'p2',programName:'Program 2',passId:'p2-3',passName:'Pass 3',place:'',season:1,exercises:[{name:'Bänkpress',sets:[{w:75,r:'6,6,8'},{w:75,r:'6,6,4'},{w:78,r:'6,5,5'}]},{name:'Sälrodd',sets:[{w:55,r:'8,10'},{w:60,r:'6,7'},{w:60,r:'6,7'}]},{name:'Bicepscurls',sets:[{w:27.5,r:'8,10,12'},{w:30,r:'7,8,8'},{w:30,r:'7,8,10'}]},{name:'Armhävningar',sets:[{w:0,r:'23,26'},{w:0,r:'20,23'},{w:0,r:'22,21'}]},{name:'Back extension',sets:[{w:20,r:'12,12,12'},{w:20,r:'10,10,10'},{w:20,r:'12,10,12'}]}]},
+    {id:hw(),date:'2024-02-11',programId:'p2',programName:'Program 2',passId:'p2-4',passName:'Pass 4',place:'',season:1,exercises:[{name:'Leg press / Hack squat',sets:[{w:150,r:'8,8,8'},{w:150,r:'8,8,8'},{w:97,r:'8,10,10'}]},{name:'Hamstring curl',sets:[{w:50,r:'6,7'},{w:52.5,r:'7,7'},{w:62.5,r:'10,12'}]},{name:'Single leg hip thrust',sets:[{w:40,r:'6,6,6,6'},{w:20,r:'8,8,10,10'},{w:30,r:'6,6,8,8'}]},{name:'Benspark',sets:[{w:97.5,r:'9,9,8'},{w:97.5,r:'9,9,10'},{w:97.5,r:'9,10,11'}]},{name:'GHD / Back extension',sets:[{w:25,r:'20,20,20'},{w:0,r:'10,10,10'},{w:0,r:'12,12,12'}]}]},
+    {id:hw(),date:'2024-02-25',programId:'p2',programName:'Program 2',passId:'p2-4',passName:'Pass 4',place:'',season:1,exercises:[{name:'Leg press / Hack squat',sets:[{w:150,r:'10,10,8'},{w:150,r:'12,12,10'},{w:97,r:'10,10,12'}]},{name:'Hamstring curl',sets:[{w:67.5,r:'10,10'},{w:67.5,r:'9,10'},{w:52.5,r:'7,8'}]},{name:'Single leg hip thrust',sets:[{w:20,r:'10,10,10,10'},{w:20,r:'10,10,12,12'},{w:20,r:'12,12,12,12'}]},{name:'Benspark',sets:[{w:97.5,r:'9,11,12'},{w:97.5,r:'9,9,9'},{w:97.5,r:'10,10,12'}]},{name:'GHD / Back extension',sets:[{w:20,r:'20,20,20'},{w:0,r:'12,12,14'},{w:0,r:'12,12,15'}]}]},
+    {id:hw(),date:'2024-03-04',programId:'p3',programName:'Rehab',passId:'p3-1',passName:'Dag 1',place:'',season:1,exercises:[{name:'Utfallsteg',sets:[{w:4,r:'16,16,16'},{w:24,r:'16,16,16'},{w:32,r:'16,16,16'}]},{name:'Legcurl',sets:[{w:40,r:'10,11,10'},{w:50,r:'12,12,12'},{w:55,r:'10,10,12'}]},{name:'Smalbänk',sets:[{w:75,r:'6,6'},{w:75,r:'6,7'},{w:75,r:'5,6'}]},{name:'Latspulldown',sets:[{w:70,r:'9,8'},{w:70,r:'7,6'},{w:70,r:'9,10'}]},{name:'Bicepscurls',sets:[{w:30,r:'10,10'},{w:30,r:'10,12'},{w:45,r:'8,9'}]}]},
+    {id:hw(),date:'2024-03-06',programId:'p3',programName:'Rehab',passId:'p3-2',passName:'Dag 3',place:'',season:1,exercises:[{name:'Latsrodd',sets:[{w:70,r:'7,7,7'},{w:70,r:'7,7,8'},{w:70,r:'6,6,6'}]},{name:'Triceps pushdown',sets:[{w:12.5,r:'7,7,8,8,10,10'},{w:12.5,r:'9,9,10,10,10,10'},{w:15,r:'8,8,12,12,13,13'}]},{name:'Benspark',sets:[{w:45,r:'8,8,10,10'},{w:45,r:'9,9,10,10'},{w:47.5,r:'9,9,10,10'}]},{name:'Rygglyft',sets:[{w:5,r:'10,10'},{w:10,r:'10,10'},{w:15,r:'10,10'}]},{name:'Bicepscurls kabel',sets:[{w:21.25,r:'7,9'},{w:22.5,r:'6'},{w:20,r:'8,11'}]}]},
+    {id:hw(),date:'2024-03-08',programId:'p3',programName:'Rehab',passId:'p3-3',passName:'Dag 5',place:'',season:1,exercises:[{name:'Hantelpress',sets:[{w:25,r:'10,10,10'},{w:27.5,r:'8,8,9'},{w:30,r:'7,8,8'}]},{name:'Curls i Smith',sets:[{w:30,r:'9,9,10'},{w:33,r:'9,10,12'},{w:45,r:'6,7,8'}]},{name:'Kelso shrugs',sets:[{w:35,r:'12,12,12'},{w:40,r:'12,12,12'},{w:50,r:'12,12,12'}]},{name:'Hamstring curls',sets:[{w:30,r:'9,9,11,11'},{w:35,r:'8,8,7,7'},{w:37.5,r:'8,8,8,8'}]},{name:'Benspark',sets:[{w:97.5,r:'9,11'},{w:97.5,r:'10,12'},{w:97.5,r:'11,12'}]}]},
+    {id:hw(),date:'2024-03-10',programId:'p3',programName:'Rehab',passId:'p3-4',passName:'Dag 7',place:'',season:1,exercises:[{name:'Jeffersons curl',sets:[{w:8,r:'6,6,6,6'},{w:10,r:'6,6,8,8'},{w:12,r:'8,8,8,8'}]},{name:'Push up hold',sets:[{w:0,r:'1:40+1:20'},{w:0,r:'1:40+1:20'},{w:0,r:'1:20+45+55'}]},{name:'Seated pancake',sets:[{w:0,r:'8,8,8,8'},{w:10,r:'8,8,8,8'},{w:20,r:'8,8,8,8'}]},{name:'Stående tåhäv',sets:[{w:50,r:'12,12,12,12'},{w:70,r:'12,12,12,12'},{w:80,r:'12,12,12,12'}]},{name:'Cable crunches',sets:[{w:30,r:'12,12,12,25'},{w:35,r:'15,15,15,19'},{w:37.5,r:'12,12,24'}]}]},
+  ];
+  DB.set('workouts', workouts);
+  DB.set('v3_init', true);
+}
+
+// SEASON HELPERS
+function passCount(passId, progId){ return DB.workouts().filter(w=>w.passId===passId&&w.programId===progId).length; }
+function currentSeason(passId, progId){ return Math.floor(passCount(passId,progId)/SEASON_SIZE)+1; }
+function sessionsInSeason(passId, progId){ return passCount(passId,progId)%SEASON_SIZE; }
+
+// NAVIGATION
+let selectedProgId = null;
+function goScreen(name){
+  document.querySelectorAll('[data-screen]').forEach(s=>s.classList.remove('active'));
+  document.querySelector('[data-screen="'+name+'"]').classList.add('active');
+  if(name==='home') renderHome();
+  if(name==='history') renderHistory('all');
+  if(name==='mått'){ document.getElementById('m-datum').value=today(); renderMåttHistory(); }
+  if(name==='manage') renderManage();
+}
+
+// HOME
+function renderHome(){
+  const programs = DB.programs();
+  if(!programs.length){ selectedProgId=null; }
+  else if(!selectedProgId||!programs.find(p=>p.id===selectedProgId)) selectedProgId=programs[0].id;
+
+  // Pills
+  document.getElementById('home-prog-pills').innerHTML = programs.map(p=>
+    `<button class="prog-pill ${p.id===selectedProgId?'active':''}" onclick="selectProg('${p.id}')">${p.icon} ${p.name}</button>`
+  ).join('');
+
+  renderPassGrid();
+  renderHomeStats();
+  checkReminder();
+  renderSeasonBanner();
+}
+
+function selectProg(id){ selectedProgId=id; renderHome(); }
+
+function renderPassGrid(){
+  const prog = DB.programs().find(p=>p.id===selectedProgId);
+  const el = document.getElementById('home-pass-grid');
+  if(!prog){ el.innerHTML='<div class="empty" style="grid-column:1/-1"><span class="empty-icon">💪</span>Inga program ännu</div>'; return; }
+  const counts = prog.passes.map(pa=>sessionsInSeason(pa.id,prog.id));
+  const minC = Math.min(...counts);
+  const nextIdx = counts.indexOf(minC);
+  el.innerHTML = prog.passes.map((pa,i)=>{
+    const s = currentSeason(pa.id,prog.id);
+    const c = sessionsInSeason(pa.id,prog.id);
+    const pct = (c/SEASON_SIZE)*100;
+    const isNext = i===nextIdx;
+    return `<div class="pass-tile ${isNext?'next-up':''}" onclick="openPass('${prog.id}','${pa.id}')">
+      ${isNext?'<div class="next-badge">Nästa</div>':''}
+      <div class="pass-tile-name">${pa.name}</div>
+      <div class="pass-tile-meta">Säsong ${s} · ${pa.exercises.length} övn.</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-lbl">${c}/${SEASON_SIZE} pass</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSeasonBanner(){
+  const prog = DB.programs().find(p=>p.id===selectedProgId);
+  const el = document.getElementById('season-banner');
+  if(!prog){ el.innerHTML=''; return; }
+  const done = prog.passes.filter(pa=>{ const c=passCount(pa.id,prog.id); return c>0&&c%SEASON_SIZE===0; });
+  if(done.length){
+    const pa=done[0]; const s=currentSeason(pa.id,prog.id);
+    el.innerHTML=`<div class="season-banner"><div style="font-size:22px">🏆</div><div><div style="font-weight:700;font-size:14px;color:var(--green);margin-bottom:3px">Ny säsong påbörjad!</div><div style="font-size:12px;color:var(--muted);line-height:1.5">${pa.name} har nu 8 pass klara — säsong ${s} startar!</div></div></div>`;
+  } else { el.innerHTML=''; }
+}
+
+function renderHomeStats(){
+  const mått=DB.mått(); const el=document.getElementById('home-stats');
+  if(!mått.length){ el.innerHTML='<div class="empty" style="grid-column:1/-1"><span class="empty-icon">📏</span>Registrera mått för statistik</div>'; return; }
+  const l=mått[0],p=mått[1];
+  el.innerHTML=[sbox('Vikt',l.vikt,'kg',p?.vikt),sbox('Midja',l.midja,'cm',p?.midja),sbox('Höft',l.höft,'cm',p?.höft),sbox('Hals',l.hals,'cm',p?.hals)].filter(Boolean).join('');
+}
+function sbox(lbl,val,unit,prev){
+  if(!val) return '';
+  const diff=prev?(val-prev).toFixed(1):null;
+  const cls=diff===null?'neu':diff<0?'up':diff>0?'dn':'neu';
+  const sign=diff>0?'+':'';
+  return `<div class="stat-box"><div class="stat-lbl">${lbl}</div><div class="stat-val">${val} <span class="stat-unit">${unit}</span></div>${diff!==null?`<div class="stat-chg ${cls}">${sign}${diff} ${unit}</div>`:'<div class="stat-chg neu">—</div>'}</div>`;
+}
+
+// ACTIVE PASS
+let curProg=null,curPass=null;
+function openPass(progId,passId){
+  const prog=DB.programs().find(p=>p.id===progId);
+  const pass=prog?.passes.find(pa=>pa.id===passId);
+  if(!prog||!pass) return;
+  curProg=prog; curPass=pass;
+  const s=currentSeason(passId,progId);
+  document.getElementById('active-prog-tag').textContent=`${prog.name} · Säsong ${s}`;
+  document.getElementById('active-pass-title').textContent=pass.name.toUpperCase();
+  document.getElementById('active-datum').value=today();
+  document.getElementById('active-plats').value='';
+  const lastW=[...DB.workouts()].filter(w=>w.passId===passId&&w.programId===progId).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  document.getElementById('active-exercises').innerHTML=pass.exercises.map((exName,ei)=>{
+    const le=lastW?.exercises?.find(e=>e.name===exName);
+    // Summarize last session: weight · reps
+    const lastW_val = le ? le.sets[0]?.w||'' : '';
+    const lastR_val = le ? le.sets.map(s=>s.r).join(', ') : '';
+    return `<div class="ex-block">
+      <div class="ex-name">${exName}</div>
+      <div class="ex-inputs">
+        <div class="wi">
+          <label>Vikt (kg)</label>
+          <input type="number" placeholder="${lastW_val||'kg'}" step="0.5" id="w-${ei}">
+        </div>
+        <div class="ex-sep">×</div>
+        <div class="ri">
+          <label>Reps per set</label>
+          <input type="text" placeholder="${lastR_val||'8,8,10'}" id="r-${ei}">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  goScreen('active-pass');
+}
+
+function saveWorkout(){
+  const date=document.getElementById('active-datum').value;
+  const place=document.getElementById('active-plats').value.trim();
+  if(!date){ showToast('⚠️ Välj datum'); return; }
+  const blocks=document.querySelectorAll('.ex-block');
+  const exercises=[];
+  blocks.forEach((block,ei)=>{
+    const name=curPass.exercises[ei];
+    const w=parseFloat(document.getElementById(`w-${ei}`)?.value)||0;
+    const rStr=document.getElementById(`r-${ei}`)?.value?.trim()||'';
+    if(!rStr&&!w) return;
+    // Parse reps string into sets array
+    const reps=rStr.split(',').map(r=>r.trim()).filter(Boolean);
+    const sets=reps.length>0 ? reps.map(r=>({w,r})) : [{w,r:rStr}];
+    exercises.push({name,sets});
+  });
+  if(!exercises.length){ showToast('⚠️ Fyll i minst en övning'); return; }
+  const countBefore=passCount(curPass.id,curProg.id);
+  const season=Math.floor(countBefore/SEASON_SIZE)+1;
+  const workouts=DB.workouts();
+  workouts.unshift({id:'w_'+Date.now(),date,place,programId:curProg.id,programName:curProg.name,passId:curPass.id,passName:curPass.name,season,exercises});
+  DB.set('workouts',workouts);
+  const countAfter=countBefore+1;
+  if(countAfter%SEASON_SIZE===0) showToast(`🏆 Säsong ${season} klar! Säsong ${season+1} börjar!`);
+  else showToast('✅ Pass sparat!');
+  goScreen('home');
+}
+
+// HISTORY
+let hFilter='all';
+function renderHistory(f){
+  hFilter=f;
+  const workouts=DB.workouts();
+  const programs=DB.programs();
+  const filtersEl=document.getElementById('history-filters');
+  const unique=['all',...new Set(workouts.map(w=>w.programId))];
+  filtersEl.innerHTML=unique.map(x=>{
+    const prog=programs.find(p=>p.id===x);
+    const lbl=x==='all'?'Alla':(prog?.name||x);
+    return `<button class="pill ${hFilter===x?'active':''}" onclick="filterH('${x}',this)">${lbl}</button>`;
+  }).join('');
+  const filtered=f==='all'?workouts:workouts.filter(w=>w.programId===f);
+  const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date));
+  const el=document.getElementById('history-list');
+  if(!sorted.length){ el.innerHTML='<div class="empty"><span class="empty-icon">📋</span>Inga träningspass ännu</div>'; return; }
+  el.innerHTML=sorted.map(w=>`<div class="hist-item">
+    <div class="hist-hdr">
+      <div>
+        <span class="hist-name">${w.passName}</span>${w.season?`<span class="stag">S${w.season}</span>`:''}
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${w.programName} · ${fmtDate(w.date)}${w.place?' · '+w.place:''}</div>
+      </div>
+      <button class="hist-del" onclick="delW('${w.id}')">✕</button>
+    </div>
+    ${w.exercises.map(ex=>{
+      const wVal = ex.sets[0]?.w;
+      const allReps = ex.sets.map(s=>s.r).join(', ');
+      return `<div class="hist-ex-name">${ex.name}</div><div class="hist-sets">${wVal?wVal+'kg · ':''} ${allReps}</div>`;
+    }).join('')}
+  </div>`).join('');
+}
+function filterH(f,btn){ document.querySelectorAll('#history-filters .pill').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); renderHistory(f); }
+function delW(id){ if(!confirm('Ta bort?')) return; DB.set('workouts',DB.workouts().filter(w=>w.id!==id)); renderHistory(hFilter); showToast('🗑️ Borttaget'); }
+
+// MÅTT
+function saveMått(){
+  const date=document.getElementById('m-datum').value;
+  const vikt=parseFloat(document.getElementById('m-vikt').value);
+  const midja=parseFloat(document.getElementById('m-midja').value);
+  const höft=parseFloat(document.getElementById('m-höft').value);
+  const hals=parseFloat(document.getElementById('m-hals').value);
+  if(!date){ showToast('⚠️ Välj datum'); return; }
+  if(!vikt&&!midja&&!höft&&!hals){ showToast('⚠️ Ange minst ett mått'); return; }
+  const mått=DB.mått();
+  mått.unshift({id:'m_'+Date.now(),date,vikt:vikt||null,midja:midja||null,höft:höft||null,hals:hals||null});
+  DB.set('mått',mått);
+  ['m-vikt','m-midja','m-höft','m-hals'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-datum').value=today();
+  showToast('✅ Mått sparat!'); renderMåttHistory();
+}
+function renderMåttHistory(){
+  const mått=DB.mått(); const el=document.getElementById('mått-history');
+  if(!mått.length){ el.innerHTML='<div class="empty"><span class="empty-icon">📏</span>Inga mätvärden ännu</div>'; return; }
+  const f=(v,u)=>v?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${v}<span style="font-size:12px;color:var(--muted)"> ${u}</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${u==='kg'?'Vikt':u==='cm'?'':''}</div></div>`:'';
+  el.innerHTML=mått.map(m=>`<div class="hist-item">
+    <div class="hist-hdr"><div style="font-size:11px;color:var(--muted)">${fmtDate(m.date)}</div><button class="hist-del" onclick="delM('${m.id}')">✕</button></div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
+      ${m.vikt?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${m.vikt}<span style="font-size:12px;color:var(--muted)"> kg</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Vikt</div></div>`:''}
+      ${m.midja?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${m.midja}<span style="font-size:12px;color:var(--muted)"> cm</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Midja</div></div>`:''}
+      ${m.höft?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${m.höft}<span style="font-size:12px;color:var(--muted)"> cm</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Höft</div></div>`:''}
+      ${m.hals?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${m.hals}<span style="font-size:12px;color:var(--muted)"> cm</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Hals</div></div>`:''}
+    </div>
+  </div>`).join('');
+}
+function delM(id){ DB.set('mått',DB.mått().filter(m=>m.id!==id)); renderMåttHistory(); }
+
+// MANAGE
+let managingProgId=null;
+function renderManage(){
+  const programs=DB.programs(); const el=document.getElementById('manage-list');
+  if(!programs.length){ el.innerHTML='<div class="empty"><span class="empty-icon">💪</span>Inga program ännu</div>'; return; }
+  el.innerHTML=programs.map(p=>`<div class="prog-card">
+    <div style="font-size:26px">${p.icon||'💪'}</div>
+    <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.passes.length} pass</div></div>
+    <div style="margin-left:auto;color:var(--muted);font-size:18px;cursor:pointer" onclick="openManagePasses('${p.id}')">›</div>
+  </div>`).join('');
+  renderSettings();
+}
+function openManagePasses(progId){
+  managingProgId=progId;
+  const prog=DB.programs().find(p=>p.id===progId);
+  if(!prog) return;
+  document.getElementById('modal-passes-title').innerHTML=prog.name+' <button class="modal-close" onclick="closeModal(\'modal-passes\')">×</button>';
+  document.getElementById('modal-passes-list').innerHTML=prog.passes.map(pa=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="font-weight:700">${pa.name}</div>
+      <div style="font-size:12px;color:var(--muted)">${pa.exercises.join(' · ')}</div>
+    </div>`).join('');
+  document.getElementById('modal-passes').classList.add('show');
+}
+function openAddProgram(){ document.getElementById('new-prog-name').value=''; document.getElementById('new-prog-icon').value=''; document.getElementById('modal-add-program').classList.add('show'); }
+function addProgram(){
+  const name=document.getElementById('new-prog-name').value.trim();
+  const icon=document.getElementById('new-prog-icon').value.trim()||'💪';
+  if(!name){ showToast('⚠️ Ange programnamn'); return; }
+  const programs=DB.programs();
+  programs.push({id:'p_'+Date.now(),name,icon,passes:[]});
+  DB.set('programs',programs);
+  closeModal('modal-add-program');
+  renderManage(); renderHome();
+  showToast('✅ Program skapat!');
+}
+function openAddPassFromManage(){ closeModal('modal-passes'); document.getElementById('new-pass-name').value=''; document.getElementById('new-pass-exercises').innerHTML=''; addExField(); document.getElementById('modal-add-pass').classList.add('show'); }
+function addExField(){ const el=document.getElementById('new-pass-exercises'); const idx=el.children.length; const d=document.createElement('div'); d.className='ex-br'; d.innerHTML=`<input type="text" placeholder="Övningsnamn" id="new-ex-${idx}"><button class="ex-del" onclick="this.parentElement.remove()">✕</button>`; el.appendChild(d); }
+function addPass(){
+  const name=document.getElementById('new-pass-name').value.trim();
+  if(!name){ showToast('⚠️ Ange passnamn'); return; }
+  const inputs=document.querySelectorAll('#new-pass-exercises input');
+  const exercises=[...inputs].map(i=>i.value.trim()).filter(Boolean);
+  if(!exercises.length){ showToast('⚠️ Lägg till minst en övning'); return; }
+  const progId=managingProgId||selectedProgId;
+  const programs=DB.programs();
+  const prog=programs.find(p=>p.id===progId);
+  if(!prog){ showToast('⚠️ Välj ett program'); return; }
+  prog.passes.push({id:'pa_'+Date.now(),name,exercises});
+  DB.set('programs',programs);
+  closeModal('modal-add-pass');
+  renderManage(); renderHome();
+  showToast('✅ Pass skapat!');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// REMINDER
+function checkReminder(){
+  const s=DB.settings(); const el=document.getElementById('reminder');
+  if(!s.reminders){ el.classList.remove('show'); return; }
+  const today2=new Date();
+  if(today2.getDay()!==s.reminderDay){ el.classList.remove('show'); return; }
+  const mått=DB.mått();
+  const week=new Date(today2.getTime()-7*24*60*60*1000);
+  const recent=mått.find(m=>new Date(m.date+'T12:00:00')>=week);
+  el.classList.toggle('show',!recent);
+}
+function toggleReminder(){ const s=DB.settings(); s.reminders=!s.reminders; DB.set('settings',s); renderSettings(); }
+function renderSettings(){ const s=DB.settings(); document.getElementById('rem-tog').className='tog'+(s.reminders?' on':''); document.getElementById('rem-day').value=s.reminderDay; }
+function saveSettings(){ const s=DB.settings(); s.reminderDay=parseInt(document.getElementById('rem-day').value); DB.set('settings',s); }
+
+// EXPORT / CLEAR
+function exportData(){ const d={programs:DB.programs(),workouts:DB.workouts(),mått:DB.mått(),exportedAt:new Date().toISOString()}; const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='träningsdagbok.json'; a.click(); showToast('📤 Exporterat!'); }
+function clearAll(){ if(!confirm('Radera ALL data permanent?')) return; ['programs','workouts','mått','settings','v3_init'].forEach(k=>localStorage.removeItem(k)); location.reload(); }
+
+// HELPERS
+function today(){ return new Date().toISOString().split('T')[0]; }
+function fmtDate(d){ if(!d) return ''; return new Date(d+'T12:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'}); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+initData();
+document.getElementById('m-datum').value=today();
+renderHome();
+</script>
+</body>
+</html>
