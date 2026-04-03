@@ -1,0 +1,22 @@
+json
+
+{
+  "name": "Träningsdagbok",
+  "short_name": "Träning",
+  "start_url": "/Traning/",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#080810",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/080810/e8ff47?text=T",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/080810/e8ff47?text=T",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
