@@ -696,11 +696,7 @@ function fmtDate(d){ if(!d) return ''; return new Date(d+'T12:00:00').toLocaleDa
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
   // OFFLINE: register service worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
+
 initData();
 document.getElementById('m-datum').value=today();
 renderHome();
