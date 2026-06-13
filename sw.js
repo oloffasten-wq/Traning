@@ -1,4 +1,4 @@
-const CACHE_NAME = 'traningsdagbok-v1';
+const const CACHE_NAME = 'traningsdagbok-v2';
 const URLS_TO_CACHE = [
   './',
   './index.html',
