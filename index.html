@@ -259,6 +259,12 @@ select option{background:#181826;}
           <div class="tog-desc" style="margin-bottom:12px">Ladda ner all data som JSON</div>
           <button class="btn btn-sec" onclick="exportData()">📤 Exportera</button>
         </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px">
+          <div class="tog-lbl" style="margin-bottom:4px">Importera data</div>
+          <div class="tog-desc" style="margin-bottom:12px">Återställ från en tidigare exporterad JSON-fil</div>
+          <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importData(event)">
+          <button class="btn btn-sec" onclick="document.getElementById('import-file').click()">📥 Importera</button>
+        </div>
         <div style="border-top:1px solid var(--border);padding-top:14px">
           <div class="tog-lbl" style="color:var(--danger);margin-bottom:4px">Rensa all data</div>
           <div class="tog-desc" style="margin-bottom:12px">Tar bort all data permanent</div>
@@ -660,6 +666,28 @@ function saveSettings(){ const s=DB.settings(); s.reminderDay=parseInt(document.
 
 // EXPORT / CLEAR
 function exportData(){ const d={programs:DB.programs(),workouts:DB.workouts(),mått:DB.mått(),exportedAt:new Date().toISOString()}; const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='träningsdagbok.json'; a.click(); showToast('📤 Exporterat!'); }
+function importData(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d || (!d.programs && !d.workouts && !d.mått)){ showToast('⚠️ Ogiltig filstruktur'); return; }
+      if(!confirm('Importera data? Detta skriver över all nuvarande data.')) return;
+      if(d.programs) DB.set('programs', d.programs);
+      if(d.workouts) DB.set('workouts', d.workouts);
+      if(d.mått) DB.set('mått', d.mått);
+      DB.set('v3_init', true);
+      showToast('✅ Data importerad!');
+      renderHome(); renderManage(); renderMåttHistory(); renderHistory('all');
+    }catch(err){
+      showToast('⚠️ Kunde inte läsa filen');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
 function clearAll(){ if(!confirm('Radera ALL data permanent?')) return; ['programs','workouts','mått','settings','v3_init'].forEach(k=>localStorage.removeItem(k)); location.reload(); }
 
 // HELPERS
@@ -674,6 +702,12 @@ if('serviceWorker' in navigator){
   });
 }
 
+initData();
+document.getElementById('m-datum').value=today();
+renderHome();
+</script>
+</body>
+</html>
 initData();
 document.getElementById('m-datum').value=today();
 renderHome();
