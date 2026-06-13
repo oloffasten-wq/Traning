@@ -266,7 +266,7 @@ select option{background:#181826;}
         </div>
       </div>
     </div>
-    <div style="text-align:center;padding:24px;color:var(--muted);font-size:11px">All data sparas lokalt på din enhet</div>
+    <div style="text-align:center;padding:24px;color:var(--muted);font-size:11px">All data sparas lokalt på din enhet · Fungerar offline</div>
   </div>
   <div class="bottom-nav">
     <button class="nav-btn" onclick="goScreen('home')"><span class="nav-icon">🏠</span>Hem</button>
@@ -337,6 +337,12 @@ function initData(){
       { id:'p2-2', name:'Pass 2', exercises:['SRDL','Sissy squat','Hip adduktor','Legcurl','GHD situp / Back extension'] },
       { id:'p2-3', name:'Pass 3', exercises:['Bänkpress','Sälrodd','Bicepscurls','Armhävningar','Back extension'] },
       { id:'p2-4', name:'Pass 4', exercises:['Leg press / Hack squat','Hamstring curl','Single leg hip thrust','Benspark','GHD / Back extension'] }
+    ]},
+    { id:'p4', name:'Program 4', icon:'🔥', passes:[
+      { id:'p4-1', name:'Upper A', exercises:['Smalbänk','Hammercurls med rep','Latsrodd med kablar','Lateral raises med hantlar'] },
+      { id:'p4-2', name:'Lower A', exercises:['Hack squat','Hamstring curls','Stående tåhäv','Enbens hip thrust med hantel'] },
+      { id:'p4-3', name:'Upper B', exercises:['T-bar row brett grepp','Incline hantelpress','Bicepscurls med EZ-bar','Triceps pushdown'] },
+      { id:'p4-4', name:'Lower B', exercises:['RDL','Sissy squat i Smith machine','Back extensions','Copenhagen plank'] }
     ]},
     { id:'p3', name:'Rehab', icon:'🩹', passes:[
       { id:'p3-1', name:'Dag 1', exercises:['Utfallsteg','Legcurl','Smalbänk','Latspulldown','Bicepscurls'] },
@@ -569,7 +575,6 @@ function saveMått(){
 function renderMåttHistory(){
   const mått=DB.mått(); const el=document.getElementById('mått-history');
   if(!mått.length){ el.innerHTML='<div class="empty"><span class="empty-icon">📏</span>Inga mätvärden ännu</div>'; return; }
-  const f=(v,u)=>v?`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">${v}<span style="font-size:12px;color:var(--muted)"> ${u}</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${u==='kg'?'Vikt':u==='cm'?'':''}</div></div>`:'';
   el.innerHTML=mått.map(m=>`<div class="hist-item">
     <div class="hist-hdr"><div style="font-size:11px;color:var(--muted)">${fmtDate(m.date)}</div><button class="hist-del" onclick="delM('${m.id}')">✕</button></div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
@@ -661,6 +666,13 @@ function clearAll(){ if(!confirm('Radera ALL data permanent?')) return; ['progra
 function today(){ return new Date().toISOString().split('T')[0]; }
 function fmtDate(d){ if(!d) return ''; return new Date(d+'T12:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'}); }
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+// OFFLINE: register service worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 
 initData();
 document.getElementById('m-datum').value=today();
